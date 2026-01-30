@@ -1,0 +1,10 @@
+{% extends 'home.html' %}
+{% block content %}
+<div class="divclass">
+    <form action="/api/v1/mybalance" method="post" ><br><br><br>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input class="glash-input" type="password" name="password" placeholder="Enter your password" required><br><br>
+        <button class="glash-btn" type="submit" >Submit</button>
+    </form>
+</div>
+{% endblock %}

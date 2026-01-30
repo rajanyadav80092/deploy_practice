@@ -1,0 +1,11 @@
+{% extends  'home.html' %}
+{% block content %}
+<div class="divclass">
+    <form action="/api/v1/addbalance" method="post">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        <input class="glash-input" type="number" name="amount"  placeholder="Add amount" required><br><br>
+        <input class="glash-input"type="password" name="password"  placeholder="Old password" required ><br><br>
+        <button class="glash-btn" type="submit">Add-Balance</button>
+    </form>
+</div>
+{% endblock %}
