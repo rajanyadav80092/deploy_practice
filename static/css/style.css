@@ -89,3 +89,11 @@ body{
 .setting a{
     text-decoration: none;
 }
+
+.flash{
+    position: absolute;
+    font-size: large;
+    top:340px;
+    left:100px;
+    color: aliceblue;
+}

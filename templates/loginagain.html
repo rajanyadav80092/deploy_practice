@@ -1,0 +1,10 @@
+{% extends 'home.html' %}
+{% block content %}
+<div class="divclass">
+    <form action="/api/v1/loginagain" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="number" name="password" class="glash-input" placeholder="NEW PASSWORD" required><br><br>
+        <button class="glash-btn">Submit</button>
+    </form>
+</div>
+{% endblock %}

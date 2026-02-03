@@ -1,9 +1,10 @@
-from flask import jsonify,render_template,redirect,url_for,session,flash,Blueprint,request
+from flask import jsonify,render_template,redirect,url_for,session,flash,Blueprint,request,json
 from models import User,Balance,Order
 from extensions import db
 from werkzeug.security import generate_password_hash,check_password_hash
 from sqlalchemy import or_
 import redis
+import random
 
 current_redis=redis.Redis(
     host="localhost",
@@ -12,6 +13,8 @@ current_redis=redis.Redis(
     decode_responses=True
 )
 
+def generate_otp():
+    return str(random.randint(100000,999999))
 
 
 v1_auth=Blueprint("v1_auth",__name__)
@@ -57,7 +60,8 @@ def logout():
     if "user_id" not in session:
         return redirect("/login")
     session.clear()
-    return jsonify({"msg":"logout successfullly"})
+    flash("logout successfullly")
+    return render_template("login.html")
 
 @v1_auth.route("/make-admin/<int:id>")
 def make_admin(id):
@@ -83,3 +87,64 @@ def make_admin_email():
         db.session.commit()
         return jsonify({"msg":f"{user.name} made admin"})
     return jsonify({"msg":"only admin make admin"})
+
+@v1_auth.route("/forget",methods=["POST"])
+def forget():
+    identifier=request.form.get("identifier")
+    if identifier:
+        user=User.query.filter(or_(User.name==identifier,
+                                       User.email==identifier,
+                                       User.mobile==identifier)).first()
+        if user:
+            otp=generate_otp()
+            redis_key=f"otp:{user.mobile}"
+            current_redis.setex(redis_key,120,otp)
+            print("sent otp:",f"otp : {otp} phone : {user.mobile}")
+            flash("fill otp")
+            session["reset_user_id"]=user.id
+            return render_template("verify.html")
+        return jsonify({"msg":"error user not found"})
+    flash("first fill identity")
+    return render_template("forget.html")
+
+@v1_auth.route("/verifyotp",methods=["POST"])
+def verify_otp():
+    id=session.get("reset_user_id")
+    otp=request.form.get("otp")
+    
+    if not id:
+        return jsonify({"msg":"phone not found"})
+    user=User.query.get(id)
+    
+    redis_key=f"otp:{user.mobile}"
+    saved_otp=current_redis.get(redis_key)
+    
+    if saved_otp is None:
+        print(f"mobile : {saved_otp}")
+        return jsonify({"error": "OTP expired or invalid"}), 400
+    
+    if saved_otp == otp:
+        current_redis.delete(redis_key)
+        flash("correct otp")
+        return render_template("loginagain.html")
+    return jsonify({"error": "Incorrect OTP"}),400
+    
+    
+@v1_auth.route("/loginagain",methods=["POST"])
+def loginagain():
+    password=request.form.get("password")
+    id=session.get("reset_user_id")
+    user=User.query.get(id)
+    if not user:
+        return jsonify({"msg":"user not found"})
+    user.password=generate_password_hash(password)
+    session["user_id"]=user.id
+    session.pop("reset_user_id", None)
+    session["user_role"]=user.role
+    db.session.commit()
+    flash("login successfull")
+    return render_template("addorder.html")
+    
+    
+    
+    

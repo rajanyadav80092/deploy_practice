@@ -1,0 +1,10 @@
+{% extends 'home.html' %}
+{% block content %}
+<div class="divclass">
+<form action="/api/v1/forget" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input class="glash-input" type="text" name="identifier" placeholder="enter your mobile/email/name" required><br><br>
+    <button class="glash-btn">Submit</button>
+</form>
+</div>
+{% endblock %}

@@ -2,9 +2,9 @@
 {% block content %}
 <div class="divclass">
 <form action="/api/v1/addorder" method="post">
-   <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-    <input class="glash-input" type="text" name="product" placeholder="enter your product" ><br><br>
-    <input class="glash-input" type="number" name="amount" placeholder="enter amount"><br><br>
+   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input class="glash-input" type="text" name="product" placeholder="enter your product" required><br><br>
+    <input class="glash-input" type="number" name="amount" placeholder="enter amount" required><br><br>
     <button class="glash-btn" type="submit">Addorder</button><br>
 </form>
 </div>

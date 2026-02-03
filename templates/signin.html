@@ -2,6 +2,7 @@
 {% block content %}
 <div class="divclass">
 <form action="/api/v1/signin" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 <input class="glash-input" type="text" name="name" placeholder="Name" required><br>
 <input class="glash-input" type="email" name="email" placeholder="Enter your email" required><br>
 <input class="glash-input" type="mobile" name="mobile" placeholder="Enter your mobile" required><br>

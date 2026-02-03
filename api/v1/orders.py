@@ -15,6 +15,7 @@ current_redis=redis.Redis(
     port=6379,
     decode_responses=True
 )
+
 @v1_orders.route("/totalbalance")
 def all_balance():
     if "user_id" not in session:

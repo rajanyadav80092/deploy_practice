@@ -1,0 +1,14 @@
+{% extends 'home.html' %}
+{% block content %}
+<div class="divclass">
+    <form action="/api/v1/user_update" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="text" class="glash-input" name="name" placeholder="Enter your name" required><br>
+        <input type="email" class="glash-input" name="email" placeholder="Enter your email" required><br>
+        <input type="number" class="glash-input" name="mobile" placeholder="Enter your mobile" required><br>
+        <input type="number" class="glash-input" name="age"placeholder="Enter your age" required ><br>
+        <input type="password" class="glash-input" name="password" placeholder="Enter your password" required><br>
+        <button class="glash-btn" type="submit">Update</button>
+    </form>
+</div>
+{% endblock %}
