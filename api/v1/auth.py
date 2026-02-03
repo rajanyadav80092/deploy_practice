@@ -111,7 +111,6 @@ def forget():
 def verify_otp():
     id=session.get("reset_user_id")
     otp=request.form.get("otp")
-    
     if not id:
         return jsonify({"msg":"phone not found"})
     user=User.query.get(id)
