@@ -2,6 +2,8 @@ import requests
 import os
 
 FAST2SMS_API_KEY = os.getenv("FAST2SMS_API_KEY")
+if not FAST2SMS_API_KEY:
+    print("FAST2SMS_API_KEY is missing from environment variables")
 
 def send_sms(mobile, otp):
     try:
@@ -12,7 +14,7 @@ def send_sms(mobile, otp):
             'authorization': FAST2SMS_API_KEY,
             'Content-Type': "application/x-www-form-urlencoded",
         }
-
+        print("API KEY:", FAST2SMS_API_KEY)
         response = requests.post(url, data=payload, headers=headers)
         return response.json()
 

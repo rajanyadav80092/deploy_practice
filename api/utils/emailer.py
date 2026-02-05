@@ -17,6 +17,7 @@ def send_email(to_email, otp):
         server.login(EMAIL_USER, EMAIL_PASS)
         server.sendmail(EMAIL_USER, to_email, email_text)
         server.quit()
+        print("EMAIL USER:", EMAIL_USER)
 
         return True
 

@@ -8,6 +8,7 @@ __pycache__/
 venv/
 .app.py python app.run
 .c
+.env
 .c.pub
 __pycache__/
 *.pyc
