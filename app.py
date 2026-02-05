@@ -1,3 +1,5 @@
+from dotenv import load_dotenv
+load_dotenv()
 from flask import Flask,render_template,redirect,jsonify,flash,request,session
 from config import Config
 from extensions import db

@@ -5,6 +5,9 @@ from werkzeug.security import generate_password_hash,check_password_hash
 from sqlalchemy import or_
 import redis
 import random
+from utils.sms import send_sms
+from utils.emailer import send_email
+
 
 current_redis=redis.Redis(
     host="localhost",
@@ -28,6 +31,10 @@ def signin():
     password=request.form.get("password")
     is_first_user=User.query.count()==0
     
+    
+    if not all([name, email, mobile, password, age]):
+        flash("All fields are required")
+        return redirect(url_for("signin"))
     
     hashed=generate_password_hash(password)
     
@@ -99,8 +106,13 @@ def forget():
             otp=generate_otp()
             redis_key=f"otp:{user.mobile}"
             current_redis.setex(redis_key,120,otp)
+            # REAL DELIVERY START
+            send_sms(user.mobile, otp)
+            send_email(user.email, otp)
+            # REAL DELIVERY END
+
+            flash("OTP sent to your mobile and email")
             print("sent otp:",f"otp : {otp} phone : {user.mobile}")
-            flash("fill otp")
             session["reset_user_id"]=user.id
             return render_template("verify.html")
         return jsonify({"msg":"error user not found"})
