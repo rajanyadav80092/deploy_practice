@@ -40,6 +40,14 @@ app.register_blueprint(v1_orders,url_prefix="/api/v1")
 app.register_blueprint(v1_update,url_prefix="/api/v1")
 
 
+MAIL_SERVER = os.getenv("EMAIL_HOST")
+MAIL_PORT = os.getenv("EMAIL_PORT")
+MAIL_USERNAME = os.getenv("EMAIL_USER")
+MAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+MAIL_USE_TLS = True
+
+
+
 
 @app.route("/")
 def home():

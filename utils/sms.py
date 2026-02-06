@@ -15,7 +15,14 @@ def send_sms(mobile, otp):
             'Content-Type': "application/x-www-form-urlencoded",
         }
         print("API KEY:", FAST2SMS_API_KEY)
+        print("Sending SMS to:", mobile)
+        
+        
         response = requests.post(url, data=payload, headers=headers)
+        
+        
+        print("FAST2SMS STATUS CODE:", response.status_code)
+        print("FAST2SMS RESPONSE:", response.text)
         return response.json()
 
     except Exception as e:
