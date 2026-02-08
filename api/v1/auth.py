@@ -182,7 +182,8 @@ def delete_bank():
     if not  bal:
         flash("balance id not made")
         return redirect("/addaccount")
-    if bal and check_password_hash(bal.password,passowrd):
+    password=request.form.get("password")
+    if bal and check_password_hash(bal.password,password):
         db.session.delete(bal)
         db.session.commit()
         flash("your bank account deleted")
