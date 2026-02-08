@@ -132,7 +132,9 @@ def allorder():
             "allorder":json.loads(cache_data)
         })
     product=allord()
-    current_redis.setex(cache_key,100,json.dumps(product))
+    if product:
+        return "not order please buy something"
+    current_redis.setex(cache_key,200,json.dumps(product))
     return jsonify({
         "source":"database",
         "allorder":product
@@ -189,7 +191,7 @@ def all_user():
             "role":u.role,
             "name":u.name,
             "mobile":u.mobile,
-            "password":u.password,
+            "email":u.email,
             "age":u.age
             
         })
