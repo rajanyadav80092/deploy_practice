@@ -157,5 +157,35 @@ def loginagain():
     return render_template("addorder.html")
     
     
-    
-    
+@v1_auth.route("/delete_user",methods=["POST"])
+def delete_user():
+    if "user_id" not in session:
+        return redirect("/login")
+    id=session["user_id"]
+    user=User.query.get(id)
+    if not user:
+        return jsonify({"msg":"user not found"})
+    password=request.form.get("password")
+    if user and not check_password_hash(user.password,password):
+        return jsonify({"msg":"incorrect password"})
+    db.session.delete(user)
+    db.session.commit()
+    flash("your id deleted")
+    return redirect("/signin")
+
+@v1_auth.route("/delete_bank",methods=["POST"])
+def delete_bank():
+    if "user_id" not in session:
+        return redirect("/login")
+    id=session["user_id"]
+    bal=Balance.query.filter_by(user_bal_id=id).first()
+    if not  bal:
+        flash("balance id not made")
+        return redirect("/addaccount")
+    if bal and check_password_hash(bal.password,passowrd):
+        db.session.delete(bal)
+        db.session.commit()
+        flash("your bank account deleted")
+        return redirect("/addaccount")
+    return jsonify({"msg":"incorrect password"})
+        

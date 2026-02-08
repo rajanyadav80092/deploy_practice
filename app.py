@@ -97,6 +97,14 @@ def update_user():
 def update_account():
     return render_template("update_account.html")
 
+@app.route("/delete")
+def delete():
+    return render_template("delete.html")
+
+@app.route("/delete_ban")
+def delete_ban():
+    return render_template("delete_bank.html")
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

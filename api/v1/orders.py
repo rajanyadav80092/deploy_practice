@@ -104,13 +104,9 @@ def add_order():
     flash("order added successfully")
     return render_template("addorder.html")
 
-@v1_orders.route("/allord")
+
 def allord():
     time.sleep(4)
-    if "user_id" not in session:
-        return redirect("/login")
-    if session["user_role"] != "admin":
-        return jsonify({"msg":"your are not visit this route"})
     order=Order.query.all()
     row=[]
     for o in order:
@@ -124,6 +120,10 @@ def allord():
 
 @v1_orders.route("/allorder")
 def allorder():
+    if "user_id" not in session:
+        return redirect("/login")
+    if session["user_role"]!="admin":
+        return jsonify({"msg":"only admin axis this site"})
     cache_key="product"
     cache_data=current_redis.get(cache_key)
     if cache_data:
@@ -184,6 +184,8 @@ def all_user():
     if session["user_role"]!="admin":
         return jsonify({"msg":"your are not visit this route sorry"})
     user=User.query.all()
+    if not user:
+        return jsonify({"msg":"empty file"})
     row=[]
     for u in user:
         row.append({
