@@ -4,7 +4,7 @@ body{
     width:100vw;
     height:100vh;   
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(6px);
 
 }
 
@@ -16,7 +16,7 @@ body{
     padding-top:25px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
 }
 .navbar h1{
     position: absolute;
@@ -96,4 +96,12 @@ body{
     top:340px;
     left:100px;
     color: aliceblue;
+}
+
+.baseh2{
+    color:antiquewhite;
+}
+
+.basep{
+    color:antiquewhite;
 }
