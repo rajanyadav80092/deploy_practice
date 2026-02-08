@@ -132,8 +132,8 @@ def allorder():
             "allorder":json.loads(cache_data)
         })
     product=allord()
-    if product:
-        return "not order please buy something"
+    if not product:
+        return jsonify({"msg":"not order please buy something"})
     current_redis.setex(cache_key,200,json.dumps(product))
     return jsonify({
         "source":"database",
