@@ -37,6 +37,10 @@ def signin():
         return redirect("/signin")
     
     hashed=generate_password_hash(password)
+    use=User.query.filter_by(email=email).first()
+    if use:
+        flash("duplcate email your put")
+        return redirect("/signin")
     
     user=User(name=name,email=email,age=age,mobile=mobile,password=hashed,role="admin" if is_first_user else "user")
     db.session.add(user)
