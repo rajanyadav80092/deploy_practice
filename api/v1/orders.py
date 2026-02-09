@@ -164,7 +164,9 @@ def add_balance():
     bal=Balance.query.filter_by(user_bal_id=user_id).first()
     if not bal:
         return jsonify({"msg":"bank account not found"})
-    password=generate_password_hash(request.form.get("password"))
+    password=request.form.get("password")
+    if bal and not check_password_hash(bal.password,password):
+        return jsonify({"msg":"please put correct password"})
     try:
         amount=int(request.form.get("amount"))
     except(ValueError,TypeError):
@@ -172,7 +174,6 @@ def add_balance():
         flash("invalid amount")
         return render_template("addbalance.html")
     bal.balance+=amount
-    bal.password=password
     db.session.commit()
     flash("balance add successfull")
     return redirect("/addorder")    
