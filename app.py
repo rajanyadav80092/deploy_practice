@@ -81,8 +81,8 @@ def log():
 def add_amount():
     return render_template("addbalance.html")
 
-@app.route("/mybalance")
-def mybalance():
+@app.route("/mybalanc")
+def mybalanc():
     return render_template("mybalance.html")
 
 @app.route("/setting")

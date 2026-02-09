@@ -53,19 +53,19 @@ def all_balance():
     return jsonify({
         "Account detail":row
     })
-@v1_orders.route("/mybalance",methods=["POST"])
+@v1_orders.route("/mybalance",methods=["POST","GET"])
 def balance_detail():
     if "user_id" not in session:
         return redirect("/login")
     id=session["user_id"]
     bank=Balance.query.filter_by(user_bal_id=id).first()
     if not bank:
-        return render_template("addaccount.html")
+        return redirect("/addamount")
     password=request.form.get("password")
     if bank and check_password_hash(bank.password,password):
         return jsonify({"your balance": bank.balance})
     flash("please check your password")
-    return redirect(url_for("v1_orders.balance_detail"))
+    return redirect("/mybalanc")
 
 @v1_orders.route("/balancedetail/<int:id>")
 def my_balance(id):
