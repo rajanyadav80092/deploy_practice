@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+
+<h1 class="classh1">Welcome to Dashboard</h1>
+<div class="divclass1">
+    <p>Total Orders: {{ total_orders }}</p>
+    <p>Your Balance: {{ balance }}</p>
+
+    <button class="glash-btn1"><a href="/addorder">Add Order</a></button>
+    <button class="glash-btn1"><a href="/mybalance-page">Check-Balance</a></button>
+    <button class="glash-btn1"><a  href="/logout">Logout</a></button>
+</div>
+{% endblock %}

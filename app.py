@@ -73,6 +73,14 @@ def add_order():
 def addaccount():
     return render_template("addaccount.html")
 
+@app.route("/loginagain")
+def log():
+    return render_template("loginagain.html")
+
+@app.route("/addamount")
+def add_amount():
+    return render_template("addbalance.html")
+
 @app.route("/mybalance")
 def mybalance():
     return render_template("mybalance.html")
@@ -88,6 +96,10 @@ def forget():
 @app.route("/makeadmin")
 def make():
     return render_template("make-admin.html")
+
+@app.route("/verify")
+def very():
+    return render_template("verify.html")
 
 @app.route("/update_user")
 def update_user():

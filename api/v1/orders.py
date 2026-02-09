@@ -16,6 +16,19 @@ current_redis=redis.Redis(
     decode_responses=True
 )
 
+def allord():
+    time.sleep(4)
+    order=Order.query.all()
+    row=[]
+    for o in order:
+        row.append({
+            "order":o.id,
+            "amount":o.amount,
+            "product":o.product,
+            "user_id":o.user_id
+        })
+    return row
+
 @v1_orders.route("/totalbalance")
 def all_balance():
     if "user_id" not in session:
@@ -23,7 +36,8 @@ def all_balance():
     # if request.form.get("csrf_token") != session.get("csrf_token"):
         
     if session["user_role"] != "admin":
-        return jsonify({"msg":"your are not visit this page"})
+        flash("your are not visit this page")
+        return redirect("/")
     Acc=Balance.query.all()
     row=[]
     for a in Acc:
@@ -50,7 +64,8 @@ def balance_detail():
     password=request.form.get("password")
     if bank and check_password_hash(bank.password,password):
         return jsonify({"your balance": bank.balance})
-    return jsonify({"msg":"please check your password"})
+    flash("please check your password")
+    return redirect(url_for("v1_orders.balance_detail"))
 
 @v1_orders.route("/balancedetail/<int:id>")
 def my_balance(id):
@@ -74,7 +89,7 @@ def my_balance(id):
         return jsonify({
         "Acc detail":row
         })
-    return render_template("addaccount.html")
+    return redirect("/addorder")
     
 
 
@@ -96,34 +111,24 @@ def add_order():
         return redirect("/addaccount")
     if bal.balance<=amount:
         flash("your bank balance low add amount")
-        return render_template("addbalance.html")
+        return redirect("/addamount")
     bal.balance-=amount
     order=Order(amount=amount,product=product,user_id=session["user_id"])
     db.session.add(order)
     db.session.commit()
     flash("order added successfully")
-    return render_template("addorder.html")
+    return redirect("/addorder")
 
 
-def allord():
-    time.sleep(4)
-    order=Order.query.all()
-    row=[]
-    for o in order:
-        row.append({
-            "order":o.id,
-            "amount":o.amount,
-            "product":o.product,
-            "user_id":o.user_id
-        })
-    return row
+
 
 @v1_orders.route("/allorder")
 def allorder():
     if "user_id" not in session:
         return redirect("/login")
     if session["user_role"]!="admin":
-        return jsonify({"msg":"only admin axis this site"})
+        flash("only admin axis this site")
+        return redirect("/")
     cache_key="product"
     cache_data=current_redis.get(cache_key)
     if cache_data:
@@ -133,7 +138,8 @@ def allorder():
         })
     product=allord()
     if not product:
-        return jsonify({"msg":"not order please buy something"})
+        flash("not order please buy something")
+        return redirect("/addorder")
     current_redis.setex(cache_key,200,json.dumps(product))
     return jsonify({
         "source":"database",
@@ -154,7 +160,7 @@ def add_account():
     db.session.add(bala)
     db.session.commit()
     flash("balance added successfully buy order")
-    return render_template("addorder.html")
+    return redirect("/addorder")
 
 @v1_orders.route("/addbalance",methods=["POST"])
 def add_balance():
@@ -172,7 +178,7 @@ def add_balance():
     except(ValueError,TypeError):
         db.session.rollback()
         flash("invalid amount")
-        return render_template("addbalance.html")
+        return redirect("/addaccount")
     bal.balance+=amount
     db.session.commit()
     flash("balance add successfull")
@@ -186,7 +192,8 @@ def all_user():
         return jsonify({"msg":"your are not visit this route sorry"})
     user=User.query.all()
     if not user:
-        return jsonify({"msg":"empty file"})
+        flash("empty file")
+        return redirect("/signin")
     row=[]
     for u in user:
         row.append({
@@ -209,19 +216,16 @@ def order_user(id):
         return redirect("/login")
     order=Order.query.get(id)
     if not order:
-        return jsonify({"msg":"order not found"})
-    row=[]
-    if order:
-        row.append({
-            "product":o.product,
-            "amount":o.amount,
-            "order_id":o.id
-        })
+        flash("order not found")
+        return redirect("/addorder")
     return jsonify({
-        "order":row,
-        "user_name":o.user.name,
-        "user_id":o.user_id
-    })
+        "product":order.product,
+        "amount":order.amount,
+        "order_id":order.id,
+        "user_name":order.user.name,
+        "user_id":order.user_id
+        })
+        
 
 @v1_orders.route("/order/user/<int:id>")
 def user_order(id):
@@ -232,7 +236,8 @@ def user_order(id):
     user=User.query.get(id)
     row=[]
     if not user:
-        return jsonify({"msg":"User not found"})
+        flash("User not found")
+        return redirect("/")
     for o in user.orders:
         row.append({
             "user_id":o.id,
@@ -244,3 +249,35 @@ def user_order(id):
         "user_name":user.name,
         "user_id":o.user_id
     })
+    
+@v1_orders.route("/dashboard")
+def dashboard():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    user_id = session["user_id"]
+
+    total_orders = Order.query.filter_by(user_id=user_id).count()
+
+    balance = Balance.query.filter_by(user_bal_id=user_id).first()
+
+    return render_template("dashboard.html",
+        total_orders=total_orders,
+        balance=balance.balance if balance else 0
+    )
+
+@v1_orders.route("/admin-dashboard")
+def admin_dashboard():
+    if session.get("user_role") != "admin":
+        flash("only admin allowed")
+        return redirect("/")
+
+    total_users = User.query.count()
+    total_orders = Order.query.count()
+    total_balance = db.session.query(db.func.sum(Balance.balance)).scalar()
+
+    return render_template("admin_dashboard.html",
+        total_users=total_users,
+        total_orders=total_orders,
+        total_balance=total_balance
+    )

@@ -34,7 +34,7 @@ def signin():
     
     if not all([name, email, mobile, password, age]):
         flash("All fields are required")
-        return redirect(url_for("signin"))
+        return redirect("/signin")
     
     hashed=generate_password_hash(password)
     
@@ -52,14 +52,15 @@ def login():
                          User.email==identifier,
                          User.mobile==identifier)).first()
     if not user:
-        return jsonify({"msg":"user not found"})
-    
+        flash("user not found")
+        return redirect("/login")
     if user and  check_password_hash(user.password,password):
         session["user_id"]=user.id
         session["user_role"]=user.role
         flash("user login successfull")
         return redirect("/addorder")
-    return jsonify({"msg":"check your password"})
+    flash("check your password")
+    return redirect("/login")
 
 
 @v1_auth.route("/logout")
@@ -68,20 +69,24 @@ def logout():
         return redirect("/login")
     session.clear()
     flash("logout successfullly")
-    return render_template("login.html")
+    return redirect("/login")
 
 @v1_auth.route("/make-admin/<int:id>")
 def make_admin(id):
     if "user_id" not in session:
         return redirect("/login")
     if session["user_role"] != "admin":
-        return jsonify({"msg":"only admin make admin"})
+        flash("only admin make admin")
+        return redirect("/")
     user=User.query.get(id)
     if not user:
-        return jsonify({"msg":"user not found"})
+        flash("user not found put correct user id")
+        return redirect("/")
     user.role="admin"
     db.session.commit()
-    return jsonify({"msg":f"{user.name} made by admin"})
+    flash(f"{user.name} made by admin")
+    return redirect("/")
+    
 
 @v1_auth.route("/admin-email",methods=["POST"])
 def make_admin_email():
@@ -92,8 +97,10 @@ def make_admin_email():
         user=User.query.filter_by(email=email).first()
         user.role="admin"
         db.session.commit()
-        return jsonify({"msg":f"{user.name} made admin"})
-    return jsonify({"msg":"only admin make admin"})
+        flash(f"{user.name} made admin")
+        return redirect("/")
+    flash("only admin make admin")
+    return redirect("/")
 
 @v1_auth.route("/forget",methods=["POST"])
 def forget():
@@ -114,17 +121,19 @@ def forget():
             flash("OTP sent to your mobile and email")
             print("sent otp:",f"otp : {otp} phone : {user.mobile}")
             session["reset_user_id"]=user.id
-            return render_template("verify.html")
-        return jsonify({"msg":"error user not found"})
+            return redirect("/verify")
+        flash("error user not found")
+        return redirect("/forget")
     flash("first fill identity")
-    return render_template("forget.html")
+    return redirect("/forget")
 
 @v1_auth.route("/verifyotp",methods=["POST"])
 def verify_otp():
     id=session.get("reset_user_id")
     otp=request.form.get("otp")
     if not id:
-        return jsonify({"msg":"phone not found"})
+        flash("phone not found")
+        return redirect("/forget")
     user=User.query.get(id)
     
     redis_key=f"otp:{user.mobile}"
@@ -132,13 +141,15 @@ def verify_otp():
     
     if saved_otp is None:
         print(f"mobile : {saved_otp}")
-        return jsonify({"error": "OTP expired or invalid"}), 400
+        flash("OTP expired or invalid"), 400
+        return redirect("/forget")
     
     if saved_otp == otp:
         current_redis.delete(redis_key)
         flash("correct otp")
-        return render_template("loginagain.html")
-    return jsonify({"error": "Incorrect OTP"}),400
+        return redirect("/loginagain")
+    flash("Incorrect OTP"),400
+    return redirect("/verify")
     
     
 @v1_auth.route("/loginagain",methods=["POST"])
@@ -147,14 +158,15 @@ def loginagain():
     id=session.get("reset_user_id")
     user=User.query.get(id)
     if not user:
-        return jsonify({"msg":"user not found"})
+        flash("user not found")
+        return redirect("/signin")
     user.password=generate_password_hash(password)
     session["user_id"]=user.id
     session.pop("reset_user_id", None)
     session["user_role"]=user.role
     db.session.commit()
     flash("login successfull")
-    return render_template("addorder.html")
+    return redirect("/addorder")
     
     
 @v1_auth.route("/delete_user",methods=["POST"])
@@ -164,10 +176,12 @@ def delete_user():
     id=session["user_id"]
     user=User.query.get(id)
     if not user:
-        return jsonify({"msg":"user not found"})
+        flash("user not found")
+        return redirect("/signin")
     password=request.form.get("password")
     if user and not check_password_hash(user.password,password):
-        return jsonify({"msg":"incorrect password"})
+        flash("incorrect password")
+        return redirect("/delete")
     db.session.delete(user)
     db.session.commit()
     flash("your id deleted")
@@ -188,5 +202,6 @@ def delete_bank():
         db.session.commit()
         flash("your bank account deleted")
         return redirect("/addaccount")
-    return jsonify({"msg":"incorrect password"})
+    flash("incorrect password")
+    return redirect("/delete_ban")
         

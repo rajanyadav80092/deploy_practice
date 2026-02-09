@@ -20,11 +20,12 @@ def user_update():
     existing_user = User.query.filter(
         or_(User.email == email)).first()
     if existing_user and user.email!=email:
-        return jsonify({"msg":"email already exist"})
+        flash("email already exist")
+        return redirect(url_for("v1_update.user_update"))
     user.email=email
     db.session.commit()
     flash("your id update successfully")
-    return render_template("addorder.html")
+    return redirect("/addorder")
 
 @v1_update.route("/update_account" , methods=["POST"])
 def update_account():

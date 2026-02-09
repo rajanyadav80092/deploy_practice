@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="classh1">Admin Dashboard</h1>
+<div class="divclass1">
+<ul>
+<li>Total Users: {{ total_users }}</li><br>
+<li>Total Orders: {{ total_orders }}</li><br>
+<li>Total Balance: {{ total_balance }}</li><br>
+</ul>
+
+<button class="glash-btn1"><a href="/api/v1/allorder">View All Orders</a></button>
+<button class="glash-btn1"><a href="/api/v1/alluser">View All Users</a></button>
+</div>
+{% endblock %}
