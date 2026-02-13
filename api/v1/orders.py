@@ -281,3 +281,23 @@ def admin_dashboard():
         total_orders=total_orders,
         total_balance=total_balance
     )
+    
+@v1_orders.route("/myorder")
+def myorder():
+    if "user_id" not in session:
+        return redirect("/login")
+    id=session["user_id"]
+    user=User.query.filter_by(id=id).first()
+    row=[]
+    for u in user.orders:
+        row.append({
+            "product":u.product,
+            "amount":u.amount,
+            "order_id":u.user_id
+        })
+    return jsonify({
+        "allorder":row,
+        "name":user.name,
+        "user_id":user.id
+    })
+        

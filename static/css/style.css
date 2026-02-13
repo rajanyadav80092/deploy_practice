@@ -158,6 +158,11 @@ body{
     text-decoration: none;
     color:rgba(239, 235, 235.0.9);
 }
+
+.glash-btn1 a{
+    color:rgba(238, 235, 235, 0.823)
+
+}
 .glash-btn1:hover{
     color:rgba(0,0,0,0.1);
     background-color: rgb(162, 162, 162);

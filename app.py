@@ -109,6 +109,10 @@ def update_user():
 def update_account():
     return render_template("update_account.html")
 
+@app.route("/myorder")
+def myord():
+    return redirect("/api/v1/myorder")
+
 @app.route("/delete")
 def delete():
     return render_template("delete.html")
