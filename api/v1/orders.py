@@ -293,7 +293,7 @@ def myorder():
         row.append({
             "product":u.product,
             "amount":u.amount,
-            "order_id":u.user_id
+            "order_id":u.id
         })
     return jsonify({
         "allorder":row,
