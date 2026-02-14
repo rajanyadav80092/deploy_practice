@@ -9,7 +9,7 @@
     <p>Your Balance: {{ balance }}</p>
 
     <button class="glash-btn1"><a href="/addorder">Add Order</a></button>
-    <button class="glash-btn1"><a href="/api/v1/myorder">Myorder</a></button>
+    <button class="glash-btn1"><a href="{{url_for('v1_orders.myorder')}}">Myorder</a></button>
     <button class="glash-btn1"><a  href="/logout">Logout</a></button>
 </div>
 {% endblock %}
