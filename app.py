@@ -109,8 +109,6 @@ def update_user():
 def update_account():
     return render_template("update_account.html")
 
-
-
 @app.route("/delete")
 def delete():
     return render_template("delete.html")

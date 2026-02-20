@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="divclass">
-    <form action="/api/v1/delete_user" method="post">
+    <form action="/api/v1/delete_user" method="delete">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input class="glash-input" type="password" name="password" placeholder="Enter your last password"><br><br>
         <button class="glash-btn" type="submit" >Submit</button>

@@ -6,7 +6,7 @@ from sqlalchemy import or_
 
 v1_update=Blueprint("v1_update",__name__)
 
-@v1_update.route("/user_update",methods=["POST"])
+@v1_update.route("/user_update",methods=["PUT"])
 def user_update():
     if "user_id" not in session:
         return redirect("/login")
@@ -27,7 +27,7 @@ def user_update():
     flash("your id update successfully")
     return redirect("/addorder")
 
-@v1_update.route("/update_account" , methods=["POST"])
+@v1_update.route("/update_account" , methods=["PUT"])
 def update_account():
     if "user_id" not in session:
         return redirect("/login")

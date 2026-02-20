@@ -1,7 +1,7 @@
 {% extends 'home.html' %}
 {% block content %}
 <div class="divclass">
-    <form action="/api/v1/user_update" method="post">
+    <form action="/api/v1/user_update" method="put">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="text" class="glash-input" name="name" placeholder="Enter your name" required><br>
         <input type="email" class="glash-input" name="email" placeholder="Enter your email" required><br>

@@ -173,7 +173,7 @@ def loginagain():
     return redirect("/addorder")
     
     
-@v1_auth.route("/delete_user",methods=["POST"])
+@v1_auth.route("/delete_user",methods=["DELETE"])
 def delete_user():
     if "user_id" not in session:
         return redirect("/login")
@@ -208,4 +208,6 @@ def delete_bank():
         return redirect("/addaccount")
     flash("incorrect password")
     return redirect("/delete_ban")
-        
+
+
+       
