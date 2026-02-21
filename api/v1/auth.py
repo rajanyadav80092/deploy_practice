@@ -234,7 +234,8 @@ def admin_user():
             db.session.commit()
             flash(f"{user.name} made to user")
             return redirect("/")
-        return jsonify({"msg":"user not found please put correct email"})
+        flash("user not found please put correct email")
+        return redirect("/admin_user")
     flash("only admin make user or admin")
     return redirect("/")
     
