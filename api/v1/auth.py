@@ -86,6 +86,9 @@ def make_admin(id):
     if not user:
         flash("user not found put correct user id")
         return redirect("/")
+    if user.role=="admin":
+        flash("user already admin")
+        return redirect("/")
     user.role="admin"
     db.session.commit()
     flash(f"{user.name} made by admin")
@@ -99,6 +102,12 @@ def make_admin_email():
     if session["user_role"]=="admin":
         email=request.form.get("email")
         user=User.query.filter_by(email=email).first()
+        if not user:
+            flash("please put correct email")
+            return redirect("/makeadmin")
+        if user.role=="admin":
+            flash(f"{user.email} is already admin")
+            return redirect("/")
         user.role="admin"
         db.session.commit()
         flash(f"{user.name} made admin")
@@ -210,4 +219,23 @@ def delete_bank():
     return redirect("/delete_ban")
 
 
-       
+@v1_auth.route("/admin_make_user",methods=["POST"])
+def admin_user():
+    if "user_id" not in session:
+        return redirect("/login")
+    if session["user_role"]=="admin":
+        email=request.form.get("email")
+        user=User.query.filter_by(email=email).first()
+        if user:
+            if user.role != "admin":
+                flash(f"{user.name} is already user")
+                return redirect("/")
+            user.role="user"
+            db.session.commit()
+            flash(f"{user.name} made to user")
+            return redirect("/")
+        return jsonify({"msg":"user not found please put correct email"})
+    flash("only admin make user or admin")
+    return redirect("/")
+    
+    

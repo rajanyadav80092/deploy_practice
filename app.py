@@ -117,6 +117,10 @@ def delete():
 def delete_ban():
     return render_template("delete_bank.html")
 
+@app.route("/admin_user")
+def admin_make_use():
+    return render_template("admin_make_user.html")
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
