@@ -73,7 +73,7 @@ def logout():
         return redirect("/login")
     session.clear()
     flash("logout successfullly")
-    return redirect("/login")
+    return redirect("/")
 
 @v1_auth.route("/make-admin/<int:id>")
 def make_admin(id):
@@ -240,3 +240,20 @@ def admin_user():
     return redirect("/")
     
     
+@v1_auth.route("/delete_by_admin/<int:id>")
+def delete_us(id):
+    if "user_id" not in session:
+        return redirect("/login")
+    if session["user_role"]!="admin":
+        flash("only admin axis this route")
+        return redirect("/addorder")
+    user=User.query.filter_by(id=id).first()
+    if not user:
+        flash("user not found")
+        return redirect(url_for("v1_orders.all_user"))
+    db.session.delete(user)
+    db.session.commit()
+    flash(f"you are deleted id {id}")
+    return redirect("/")
+        
+        

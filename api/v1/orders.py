@@ -96,6 +96,7 @@ def my_balance(id):
 @v1_orders.route("/addorder",methods=["POST"])
 def add_order():
     if "user_id" not in session:
+        flash("first login")
         return redirect("/login")
     product=request.form.get("product")
     try:
@@ -232,7 +233,7 @@ def user_order(id):
     if "user_id" not in session:
         return redirect("/login")
     if session["user_id"] != id:
-        return redirect("v1_orders.user_order",id=session["user_id"])
+        return redirect(url_for("v1_orders.user_order",id=session["user_id"]))
     user=User.query.get(id)
     row=[]
     if not user:

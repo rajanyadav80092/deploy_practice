@@ -10,10 +10,10 @@
     <nav class = "navbar">
         <h1>Order</h1>
         <a href="/">HOME</a>
-        <a href="/signin">Sign-in</a>
-        <a href="/login">Log-in</a>
+        {% if session.get("user_id") %}
         <a href="/addorder">Addorder</a>
         <a href="/setting">Settings</a>
+        {% endif %}
     </nav>
     <div class="page-wrapper">
         {% with messages=get_flashed_messages(with_categories=True) %}
