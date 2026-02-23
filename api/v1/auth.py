@@ -26,7 +26,7 @@ def generate_otp():
 
 v1_auth=Blueprint("v1_auth",__name__)
 
-def check_login_ip(user_id,ip,k=1):
+def check_login_ip(user_id,ip,k=2):
     key=f"login:{user_id}"
     current_redis.lpush(key,ip)
     current_redis.ltrim(key,0,k-1)
