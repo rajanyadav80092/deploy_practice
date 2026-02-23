@@ -79,7 +79,7 @@ body{
     width:160px;
     position: fixed;
     top: 100px;
-    right:10px;
+    right:250px;
     border-radius: 13px;
     border:none;
     flex-direction: column-reverse;  /*🔥 MAGIC */
