@@ -7,6 +7,10 @@ import redis
 import random
 from utils.sms import send_sms
 from utils.emailer import send_email
+import time
+from collections import deque
+import secrets
+from functools import wraps
 
 
 current_redis=redis.Redis(
@@ -22,7 +26,7 @@ def generate_otp():
 
 v1_auth=Blueprint("v1_auth",__name__)
 
-def check_login_ip(user_id,ip,k=3):
+def check_login_ip(user_id,ip,k=1):
     key=f"login:{user_id}"
     current_redis.lpush(key,ip)
     current_redis.ltrim(key,0,k-1)
@@ -39,8 +43,8 @@ def is_user_blocked(user_id):
 
 
  
-REQUEST_LIMIT = 20
-WINDOW_SIZE = 30
+REQUEST_LIMIT = 2
+WINDOW_SIZE = 3
 
 user_requests = {}  # user_id -> deque
 def is_rate_limited(user_id):
@@ -76,6 +80,9 @@ def rate_limit_middleware(fn):
         return fn(*args, **kwargs)
     return wrapper
 
+def generate_token():
+    return secrets.token_urlsafe(32)
+
 @v1_auth.route("/signin",methods=["POST"])
 def signin():
     name=request.form.get("name")
@@ -103,6 +110,7 @@ def signin():
     return redirect("/login")
     
 @v1_auth.route("/login",methods=["POST"])
+@rate_limit_middleware
 def login():
     identifier=request.form.get("identifier")
     password=request.form.get("password")
@@ -113,15 +121,24 @@ def login():
     if not user:
         flash("user not found")
         return redirect("/login")
-    if user and  check_password_hash(user.password,password):
-        session["user_id"]=user.id
-        session["user_role"]=user.role
-        flash("user login successfull")
-        print(f"your ip : {ip}")
-        return redirect("/addorder")
-    flash("check your password")
+    if user and  not check_password_hash(user.password,password):
+        flash("incorrect password")
+        return redirect("/login")
+    
+    if is_user_blocked(user.id):
+        flash("Account temporarily blocked")
+        return redirect("/login")
+
+    # ✅ Successful password
+    if check_login_ip(user.id, ip):
+        block_user(user.id)
+        flash("Suspicious login detected. Account blocked for 10 minutes.")
+        return redirect("/login")
+    session["user_id"]=user.id
+    session["user_role"]=user.role
+    flash("user login successfull")
     print(f"your ip : {ip}")
-    return redirect("/login")
+    return redirect("/addorder")
 
 
 @v1_auth.route("/logout")
@@ -173,6 +190,7 @@ def make_admin_email():
     return redirect("/")
 
 @v1_auth.route("/forget",methods=["POST"])
+@rate_limit_middleware
 def forget():
     identifier=request.form.get("identifier")
     if identifier:
@@ -198,6 +216,7 @@ def forget():
     return redirect("/forget")
 
 @v1_auth.route("/verifyotp",methods=["POST"])
+@rate_limit_middleware
 def verify_otp():
     id=session.get("reset_user_id")
     otp=request.form.get("otp")
@@ -223,6 +242,7 @@ def verify_otp():
     
     
 @v1_auth.route("/loginagain",methods=["POST"])
+@rate_limit_middleware
 def loginagain():
     password=request.form.get("password")
     id=session.get("reset_user_id")
@@ -240,6 +260,7 @@ def loginagain():
     
     
 @v1_auth.route("/delete_user",methods=["POST"])
+@rate_limit_middleware
 def delete_user():
     if "user_id" not in session:
         return redirect("/login")
@@ -258,6 +279,7 @@ def delete_user():
     return redirect("/signin")
 
 @v1_auth.route("/delete_bank",methods=["POST"])
+@rate_limit_middleware
 def delete_bank():
     if "user_id" not in session:
         return redirect("/login")
