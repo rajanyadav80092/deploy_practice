@@ -22,6 +22,60 @@ def generate_otp():
 
 v1_auth=Blueprint("v1_auth",__name__)
 
+def check_login_ip(user_id,ip,k=3):
+    key=f"login:{user_id}"
+    current_redis.lpush(key,ip)
+    current_redis.ltrim(key,0,k-1)
+    current_redis.expire(key,300)
+    ips=current_redis.lrange(key,0,-1)
+    if len(ips)==k and len(set(ips))==k:
+        return True
+    return False
+
+def block_user(user_id,minutes=10):
+    current_redis.setex(f"blocked:{user_id}",minutes*60,user_id)
+def is_user_blocked(user_id):
+    return current_redis.exists(f"blocked:{user_id}")
+
+
+ 
+REQUEST_LIMIT = 20
+WINDOW_SIZE = 30
+
+user_requests = {}  # user_id -> deque
+def is_rate_limited(user_id):
+    now = time.time()
+
+    if user_id not in user_requests:
+        user_requests[user_id] = deque()
+
+    q = user_requests[user_id]
+
+    # add current request
+    q.append(now)
+
+    # maintain fixed window size
+    if len(q) > WINDOW_SIZE:
+        q.popleft()
+    # count requests in window
+    if len(q) > REQUEST_LIMIT:
+        return True
+
+    return False
+
+def rate_limit_middleware(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        user_id = request.form.get("id")
+
+        if is_rate_limited(user_id):
+            return jsonify({
+                "error": "Rate limit exceeded"
+            }), 429
+
+        return fn(*args, **kwargs)
+    return wrapper
+
 @v1_auth.route("/signin",methods=["POST"])
 def signin():
     name=request.form.get("name")
@@ -52,6 +106,7 @@ def signin():
 def login():
     identifier=request.form.get("identifier")
     password=request.form.get("password")
+    ip=request.remote_addr
     user=User.query.filter(or_(User.name==identifier,
                          User.email==identifier,
                          User.mobile==identifier)).first()
@@ -62,8 +117,10 @@ def login():
         session["user_id"]=user.id
         session["user_role"]=user.role
         flash("user login successfull")
+        print(f"your ip : {ip}")
         return redirect("/addorder")
     flash("check your password")
+    print(f"your ip : {ip}")
     return redirect("/login")
 
 
@@ -182,7 +239,7 @@ def loginagain():
     return redirect("/addorder")
     
     
-@v1_auth.route("/delete_user",methods=["DELETE"])
+@v1_auth.route("/delete_user",methods=["POST"])
 def delete_user():
     if "user_id" not in session:
         return redirect("/login")
