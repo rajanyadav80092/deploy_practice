@@ -61,7 +61,10 @@ def signin():
 
 @app.route("/login")
 def login():
-    return render_template("login.html")
+    if "user_id" not in session:
+        return render_template("login.html")
+    flash("your already login")
+    return redirect("/")
 
 @app.route("/addorder")
 def add_order():

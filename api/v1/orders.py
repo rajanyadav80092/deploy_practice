@@ -30,7 +30,8 @@ def allord():
     return row
 
 def _add_recent_order(user_id,order_data,k=5):
-    key=f"recent_orders:{user_id}"
+    #  key=f"recent_orders:{user_id}"
+    key="order"
     
     #remove if already exist (avoid duplicate)
     current_redis.lrem(key,0,json.dumps(order_data))
@@ -352,9 +353,10 @@ def myorder():
 #         "value": value
 #     })
 
-@v1_orders.route("/debug-cache/<int:user_id>")
-def debug_cache(user_id):
-    key = f"recent_orders:{user_id}"
+@v1_orders.route("/debug-cache/order")
+def debug_cache():
+    # key = f"recent_orders:{user_id}"
+    key="order"
     raw_data = current_redis.lrange(key, 0, -1)
     parsed_data = [json.loads(item) for item in raw_data]
 
