@@ -30,8 +30,7 @@ def allord():
     return row
 
 def _add_recent_order(user_id,order_data,k=5):
-    #  key=f"recent_orders:{user_id}"
-    key="order"
+    key=f"recent_orders:{user_id}"
     
     #remove if already exist (avoid duplicate)
     current_redis.lrem(key,0,json.dumps(order_data))
@@ -45,17 +44,9 @@ def _add_recent_order(user_id,order_data,k=5):
     #Expire after 1 hour optional
     
     current_redis.expire(key,3600)
-    
-# def get_recent_orders(user_id):
-#     key=f"recent_orders : {user_id}"
-#     return current_redis.lrange(key,0,-1)
 
-# def get_recent_orders(user_id):
-#     ids = current_redis.lrange(f"recent_orders:{user_id}", 0, -1)
-#     return Order.query.filter(Order.id.in_(ids)).all()
-
-def get_recent_orders(user_id):
-    key = f"recent_orders:{user_id}"
+def get_recent_orders(id):
+    key=f"recent_orders:{id}"
     data = current_redis.lrange(key, 0, -1)
     return [json.loads(item) for item in data]
 
@@ -65,7 +56,6 @@ def get_recent_orders(user_id):
 def all_balance():
     if "user_id" not in session:
         return redirect("/login")
-    # if request.form.get("csrf_token") != session.get("csrf_token"):
         
     if session["user_role"] != "admin":
         flash("your are not visit this page")
@@ -254,6 +244,27 @@ def order_user(id):
     user_id=session["user_id"]
     user=User.query.filter_by(id=user_id).first()
     
+    cache_data=get_recent_orders(user_id)
+    if cache_data:
+        order_data={
+        "id":order.id,
+        "product":order.product,
+        "amount":order.amount
+        }
+    
+        _add_recent_order(user_id,order_data)
+        return jsonify({
+            "data":{
+                "product":order.product,
+                "amount":order.amount,
+                "id":order.id,
+                "user_id":user.id,
+                "user_name":user.name
+                },
+            "source":"cache"
+        })
+        
+    
     order_data={
         "id":order.id,
         "product":order.product,
@@ -267,7 +278,8 @@ def order_user(id):
         "amount":order.amount,
         "order_id":order.id,
         "user_id":order.user_id,
-        "user_name":user.name
+        "user_name":user.name,
+        "source":"database"
         })
         
 
@@ -345,18 +357,9 @@ def myorder():
         "user_id":user.id
     })
         
-# @v1_orders.route("/debug-cache/<key>")
-# def debug_cache(key):
-#     value = get_recent_orders(key)
-#     return jsonify({
-#         "key": key,
-#         "value": value
-#     })
-
-@v1_orders.route("/debug-cache/order")
-def debug_cache():
-    # key = f"recent_orders:{user_id}"
-    key="order"
+@v1_orders.route("/debug-cache/<int:user_id>")
+def debug_cache(user_id):
+    key = f"recent_orders:{user_id}"
     raw_data = current_redis.lrange(key, 0, -1)
     parsed_data = [json.loads(item) for item in raw_data]
 
