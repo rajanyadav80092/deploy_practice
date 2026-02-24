@@ -19,8 +19,6 @@ from api.v1.orders import v1_orders
 from api.v1.update import v1_update
 
 
-
-
 app.config.from_object(Config)
 app.config.update(
     # SESSION (v1)
