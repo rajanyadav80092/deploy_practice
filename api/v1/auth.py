@@ -67,10 +67,6 @@ def is_rate_limited(user_id):
     # add current request
     q.append(now)
 
-    # maintain fixed window size
-    # if len(q) > WINDOW_SIZE:
-    #     q.popleft()
-    # count requests in window
     if len(q) > REQUEST_LIMIT:
         return True
 

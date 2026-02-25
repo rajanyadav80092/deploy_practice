@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash,check_password_hash
 from functools import wraps
 import redis
 import time
+from collections import deque
 
 v1_orders=Blueprint("v1_orders",__name__)
 
@@ -16,9 +17,44 @@ current_redis=redis.Redis(
     decode_responses=True
 )
 
+REQUEST_LIMIT=3
+WINDOW_TIME=30
+
+user_requests={}
+
+def is_rate_limited(user_id):
+    now=time.time()
+    
+    if user_id not in user_requests:
+        user_requests[user_id]=deque()
+    
+    q=user_requests[user_id]
+    
+    while q and now-q[0]>WINDOW_TIME:
+        q.popleft()
+    q.append(now)
+    if len(q)>REQUEST_LIMIT:
+        return True
+    return False
+
+
+def rate_limit_middleware(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        user_id = request.form.get("id")
+
+        if is_rate_limited(user_id):
+            return jsonify({
+                "error": "Rate limit exceeded you can try after some time"
+            }), 429
+
+        return fn(*args, **kwargs)
+    return wrapper
+
+
 def allord():
     time.sleep(4)
-    order=Order.query.all()
+    order=Order.query.limit(10).offset(0).all()
     row=[]
     for o in order:
         row.append({
@@ -54,6 +90,7 @@ def get_recent_orders(id):
     
 
 @v1_orders.route("/totalbalance")
+@rate_limit_middleware
 def all_balance():
     if "user_id" not in session:
         return redirect("/login")
@@ -77,6 +114,7 @@ def all_balance():
         "Account detail":row
     })
 @v1_orders.route("/mybalance",methods=["POST","GET"])
+@rate_limit_middleware
 def balance_detail():
     if "user_id" not in session:
         return redirect("/login")
@@ -91,6 +129,7 @@ def balance_detail():
     return redirect("/mybalanc")
 
 @v1_orders.route("/balancedetail/<int:id>")
+@rate_limit_middleware
 def my_balance(id):
     if "user_id" not in session:
         return redirect("/login")
@@ -117,6 +156,7 @@ def my_balance(id):
 
 
 @v1_orders.route("/addorder",methods=["POST"])
+@rate_limit_middleware
 def add_order():
     if "user_id" not in session:
         flash("first login")
@@ -147,13 +187,15 @@ def add_order():
 
 
 @v1_orders.route("/allorder")
+@rate_limit_middleware
 def allorder():
     if "user_id" not in session:
         return redirect("/login")
     if session["user_role"]!="admin":
         flash("only admin axis this site")
         return redirect("/")
-    cache_key="product"
+    user_id=session["user_id"]
+    cache_key=f"order:{user_id}"
     cache_data=current_redis.get(cache_key)
     if cache_data:
         return jsonify({
@@ -164,13 +206,14 @@ def allorder():
     if not product:
         flash("not order please buy something")
         return redirect("/addorder")
-    current_redis.setex(cache_key,200,json.dumps(product))
+    current_redis.setex(cache_key,20,json.dumps(product))
     return jsonify({
         "source":"database",
         "allorder":product
     })
         
 @v1_orders.route("/addaccount",methods=["POST"])
+@rate_limit_middleware
 def add_account():
     if "user_id" not in session:
         return redirect("/login")
@@ -187,6 +230,7 @@ def add_account():
     return redirect("/addorder")
 
 @v1_orders.route("/addbalance",methods=["POST"])
+@rate_limit_middleware
 def add_balance():
     if "user_id" not in session:
         return redirect("/login")
@@ -214,7 +258,7 @@ def all_user():
         return redirect("/login")
     if session["user_role"]!="admin":
         return jsonify({"msg":"your are not visit this route sorry"})
-    user=User.query.all()
+    user=User.query.limit(2).offset(0).all()
     if not user:
         flash("empty file")
         return redirect("/signin")
@@ -227,7 +271,6 @@ def all_user():
             "mobile":u.mobile,
             "email":u.email,
             "age":u.age
-            
         })
     return jsonify({
         "user":row
@@ -245,6 +288,9 @@ def order_user(id):
     user_id=session["user_id"]
     user=User.query.filter_by(id=user_id).first()
     
+    
+    key=f"recent_orders : {user_id}"
+    # cache_data=current_redis.get(key)
     cache_data=get_recent_orders(user_id)
     if cache_data:
         order_data={
@@ -308,6 +354,7 @@ def user_order(id):
     })
     
 @v1_orders.route("/dashboard")
+@rate_limit_middleware
 def dashboard():
     if "user_id" not in session:
         return redirect("/login")
@@ -340,6 +387,7 @@ def admin_dashboard():
     )
     
 @v1_orders.route("/myorder")
+@rate_limit_middleware
 def myorder():
     if "user_id" not in session:
         return redirect("/login")
@@ -359,7 +407,11 @@ def myorder():
     })
         
 @v1_orders.route("/debug-cache/<int:user_id>")
+@rate_limit_middleware
 def debug_cache(user_id):
+    user=User.query.filter_by(id=user_id).first()
+    if user.role !="admin":
+        return jsonify({"msg":"only admin see this page"})
     key = f"recent_orders:{user_id}"
     raw_data = current_redis.lrange(key, 0, -1)
     parsed_data = [json.loads(item) for item in raw_data]
