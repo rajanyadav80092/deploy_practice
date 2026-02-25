@@ -28,9 +28,13 @@ v1_auth=Blueprint("v1_auth",__name__)
 
 def check_login_ip(user_id,ip,k=2):
     key=f"login:{user_id}"
+    #add top in redis
     current_redis.lpush(key,ip)
+    #only k elemenet rakho
     current_redis.ltrim(key,0,k-1)
+    #5 min auto remove
     current_redis.expire(key,300)
+    #sabhi ip ko lo 
     ips=current_redis.lrange(key,0,-1)
     if len(ips)==k and len(set(ips))==k:
         return True
@@ -38,15 +42,17 @@ def check_login_ip(user_id,ip,k=2):
 
 def block_user(user_id,minutes=10):
     current_redis.setex(f"blocked:{user_id}",minutes*60,user_id)
+    
 def is_user_blocked(user_id):
     return current_redis.exists(f"blocked:{user_id}")
 
 
  
-REQUEST_LIMIT = 2
-WINDOW_SIZE = 3
+REQUEST_LIMIT = 4
+WINDOW_TIME = 30
 
 user_requests = {}  # user_id -> deque
+
 def is_rate_limited(user_id):
     now = time.time()
 
@@ -54,13 +60,16 @@ def is_rate_limited(user_id):
         user_requests[user_id] = deque()
 
     q = user_requests[user_id]
+    
+    while q and now - q[0] > WINDOW_TIME:
+        q.popleft()
 
     # add current request
     q.append(now)
 
     # maintain fixed window size
-    if len(q) > WINDOW_SIZE:
-        q.popleft()
+    # if len(q) > WINDOW_SIZE:
+    #     q.popleft()
     # count requests in window
     if len(q) > REQUEST_LIMIT:
         return True
@@ -74,7 +83,7 @@ def rate_limit_middleware(fn):
 
         if is_rate_limited(user_id):
             return jsonify({
-                "error": "Rate limit exceeded"
+                "error": "Rate limit exceeded you can try after some time"
             }), 429
 
         return fn(*args, **kwargs)

@@ -44,6 +44,7 @@ def _add_recent_order(user_id,order_data,k=5):
     #Expire after 1 hour optional
     
     current_redis.expire(key,3600)
+    
 
 def get_recent_orders(id):
     key=f"recent_orders:{id}"
