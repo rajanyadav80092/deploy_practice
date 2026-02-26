@@ -218,9 +218,17 @@ def add_account():
     if "user_id" not in session:
         return redirect("/login")
     name=request.form.get("Acc_holder_name")
+    if len(name)>=3:
+        name=name
+    flash("user name always larger than 3")
+    return redirect("/addaccount")
+        
     balance=request.form.get("balance")
     Acc_name=request.form.get("Acc_name")
     password=request.form.get("password")
+    if len(password)<3:
+        flash("password larger than 3")
+        return redirect("/addaccount")
     hashed=generate_password_hash(password)
     Acc_num=request.form.get("Acc_num")
     bala=Balance(Acc_holder_name=name,password=hashed,Acc_name=Acc_name,account=Acc_num,user_bal_id=session["user_id"],balance=balance)
@@ -290,7 +298,6 @@ def order_user(id):
     
     
     key=f"recent_orders : {user_id}"
-    # cache_data=current_redis.get(key)
     cache_data=get_recent_orders(user_id)
     if cache_data:
         order_data={
