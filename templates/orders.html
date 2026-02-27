@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Orders</title>
+</head>
+<body>
+
+<h2>Orders List</h2>
+
+<table >
+    <tr>
+        <th>ID</th>
+        <th>Product</th>
+        <th>Amount</th>
+    </tr>
+
+    {% for order in orders %}
+    <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.product }}</td>
+        <td>{{ order.amount }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+
+<!-- 🔥 Pagination Buttons -->
+
+{% if page > 1 %}
+<a href="{{ url_for('v1_orders.allorder', page=page+1) }}"></a>
+    ⬅ Previous
+</a>
+{% endif %}
+
+&nbsp;&nbsp;
+
+Page {{ page }} of {{ total_pages }}
+
+&nbsp;&nbsp;
+
+{% if page < total_pages %}
+<a href="{{ url_for('v1_orders.allorder', page=page+1) }}"></a>
+    Next ➡
+</a>
+{% endif %}
+
+</body>
+</html>

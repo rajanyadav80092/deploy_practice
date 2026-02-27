@@ -53,10 +53,28 @@ def rate_limit_middleware(fn):
 
 
 def allord():
-    time.sleep(4)
-    order=Order.query.limit(10).offset(0).all()
+    time.sleep(1)
+    # page=request.args.get("page",1,type=int)
+    # if page:
+    #     page=page
+    # page=1
+    # limit=5
+    
+    # if page<1:
+    #     page=1
+    # offset=(page-1)*limit
+    orders=Order.query.all()
+    
+    # total_orders = Order.query.count()
+    # orders = Order.query \
+    #     .order_by(Order.id) \
+    #     .limit(limit) \
+    #     .offset(offset) \
+    #     .all()
+
+    # total_pages = (total_orders + limit - 1) // limit
     row=[]
-    for o in order:
+    for o in orders:
         row.append({
             "order":o.id,
             "amount":o.amount,
@@ -64,6 +82,14 @@ def allord():
             "user_id":o.user_id
         })
     return row
+    # return render_template(
+    #     "orders.html",
+    #     orders=orders,
+    #     page=page,
+    #     total_pages=total_pages
+    # )
+   
+
 
 def _add_recent_order(user_id,order_data,k=5):
     key=f"recent_orders:{user_id}"
@@ -208,8 +234,8 @@ def allorder():
         return redirect("/addorder")
     current_redis.setex(cache_key,20,json.dumps(product))
     return jsonify({
-        "source":"database",
-        "allorder":product
+        "order":product,
+        "source":"database"
     })
         
 @v1_orders.route("/addaccount",methods=["POST"])
