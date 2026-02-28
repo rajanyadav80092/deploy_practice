@@ -1,10 +1,12 @@
 {% extends 'home.html' %}
 {% block content %}
+<div class="main-container">
 <div class="divclass">
 <form action="/api/v1/admin_make_user" method="post">
      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input class="glash-input" type="email" name="email" placeholder="Enter admin email to make user" required><br>
     <button class="glash-btn" type="submit">Submit</button><br>
 </form>
+</div>
 </div>
 {% endblock %}

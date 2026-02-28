@@ -1,5 +1,6 @@
 {% extends 'home.html' %}
 {% block content %}
+<div class="main-container">
 <div class="divclass">
 <form action="/api/v1/addorder" method="post">
    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -7,5 +8,6 @@
     <input class="glash-input" type="number" name="amount" placeholder="enter amount" required><br><br>
     <button class="glash-btn" type="submit">Addorder</button><br>
 </form>
+</div>
 </div>
 {% endblock %}

@@ -1,5 +1,6 @@
 {% extends  'home.html' %}
 {% block content %}
+<div class="main-container">
 <div class="divclass">
     <form action="/api/v1/addbalance" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -7,5 +8,6 @@
         <input class="glash-input"type="password" name="password"  placeholder="Old password" required ><br><br>
         <button class="glash-btn" type="submit">Add-Balance</button>
     </form>
+</div>
 </div>
 {% endblock %}

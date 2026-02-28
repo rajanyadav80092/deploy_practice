@@ -1,5 +1,6 @@
 {% extends 'home.html' %}
 {% block content %}
+<div class="main-container">
 <div class="divclass">
 <form action="/api/v1/login" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -9,5 +10,6 @@
 </form>
 <a href="/signin"><button class="glash-btn">Sign-in</button></a><br><br>
 <a class="anchor" href="forget"><button class="glash-btn" >Forget-Password</button></a><br><br>
+</div>
 </div>
 {% endblock %}

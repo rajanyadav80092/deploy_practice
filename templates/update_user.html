@@ -1,5 +1,6 @@
 {% extends 'home.html' %}
 {% block content %}
+<div class="main-container">
 <div class="divclass">
     <form action="/api/v1/user_update" method="put">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -10,5 +11,6 @@
         <input type="password" class="glash-input" name="password" placeholder="Enter your password" required><br>
         <button class="glash-btn" type="submit">Update</button>
     </form>
+</div>
 </div>
 {% endblock %}

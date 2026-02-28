@@ -1,169 +1,114 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
 body{
-    margin: 0%;
-    background: url("/static/bg.jpg")no-repeat center center/cover ;
-    width:100vw;
-    height:100vh;   
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    backdrop-filter: blur(6px);
-
+    min-height:100vh;
+    background:url("/static/bg.jpg") no-repeat center center/cover;
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display:flex;
+    flex-direction:column;
 }
 
+/* 🔹 NAVBAR */
 .navbar{
-    width: 100vw;
-    height: 60px;
-    background-color:black;
+    width:100%;
+    background:black;
     color:white;
-    padding-top:25px;
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
+    padding:15px 20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
+
 .navbar h1{
-    position: absolute;
-    left:30px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-
-}
-
-.divclass{
-    height:430px;
-    width:340px;
-    border:none;
-    position: absolute;
-    top:240px;
-    left:630px;
-
-}
-
-.glash-input{
-    width: 92%;
-    display: flex;
-    align-items: center;
-    margin:10px 0px 10px 0px;
-    padding: 12px;
-    font-size: 18px;
-    border:none;
-    outline: none;
-    border-radius: 15px;
-    color:rgb(31, 11, 11);
-    backdrop-filter: blur(3px);
-}
-
-.glash-btn{
-    padding:10px;
-    border: none;
-    border-radius:13px;
-    background-color: blanchedalmond;
-    color:black;
-    font-size: 16px;
-    position: absolute;
-    left:130px;
-}
-
-
-.glash-btn:hover{
-    color: aliceblue;
-    background: black;
+    font-size:22px;
 }
 
 .navbar a{
-    font-size: 20px;
-    text-decoration: none;
     color:white;
-    
+    text-decoration:none;
+    font-size:18px;
 }
 
+/* 🔹 MAIN CENTER CONTAINER */
+.main-container{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+/* 🔹 CARD / FORM */
+.divclass{
+    width:100%;
+    max-width:350px;
+    background:rgba(255,255,255,0.15);
+    backdrop-filter:blur(10px);
+    padding:25px;
+    border-radius:20px;
+}
+
+/* 🔹 INPUT */
+.glash-input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:none;
+    border-radius:12px;
+    font-size:16px;
+    outline:none;
+}
+
+/* 🔹 BUTTON */
+.glash-btn{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    background:blanchedalmond;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.glash-btn:hover{
+    background:black;
+    color:white;
+}
+
+/* 🔹 SETTINGS PANEL */
 .setting{
-    background:rgb(239, 235, 235);
-    height: 200px;
-    width:160px;
-    position: fixed;
-    top: 100px;
-    right:250px;
-    border-radius: 13px;
-    border:none;
-    flex-direction: column-reverse;  /*🔥 MAGIC */
-    overflow-y: auto;
-    font-size: 16px;
-    text-decoration: none;
-    color:black;
-
-}
-.setting:hover{
-    color: rgb(12, 234, 160);
-}
-.setting:hover{
-    color:blanchedalmond;
+    position:fixed;
+    top:80px;
+    right:20px;
+    width:180px;
+    background:white;
+    padding:15px;
+    border-radius:15px;
 }
 
-.setting a{
+.setting a {
     text-decoration: none;
 }
 
-.flash{
-    position: absolute;
-    font-size: large;
-    top:340px;
-    left:100px;
-    color: aliceblue;
-}
+/* 🔹 MOBILE RESPONSIVE */
+@media(max-width:768px){
 
-.baseh2{
-    color:antiquewhite;
-}
+    .navbar{
+        flex-direction:column;
+        text-align:center;
+        gap:10px;
+    }
 
-.basep{
-    color:antiquewhite;
-}
+    .navbar h1{
+        font-size:18px;
+    }
 
-.divclass1{
-    height: 440px;
-    width:300px;
-    position: absolute;
-    top:220px;
-    left:400px;
-}
-
-.divclass1 p{
-    color:white;
-    font-size: 15px;
-
-}
-.classh1{
-    position: absolute;
-    top:150px;
-    left:500px;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-    font-size: 22px;
-    color:antiquewhite;
-
-}
-
-.divclass1 li{
-    color:white;
-    font-size: 15px;
-}
-
-.divclass1 button {
-    font-size: 15px;
-    color:black;
-    background-color:rgba(239, 235, 235,0.3);
-    border:none;
-    border-radius: 13px;
-    padding: 10px;
-    left:130px;
-}
-
-.divclass1 a{
-    text-decoration: none;
-    color:rgba(239, 235, 235.0.9);
-}
-
-.glash-btn1 a{
-    color:rgba(238, 235, 235, 0.823)
-
-}
-.glash-btn1:hover{
-    color:rgba(0,0,0,0.1);
-    background-color: rgb(162, 162, 162);
+    .glash-btn{
+        font-size:14px;
+    }
 }

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="main-container">
 <div class="divclass">
     <form action="/api/v1/delete_bank" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -7,5 +8,6 @@
         <button class="glash-btn" type="submit">Submit</button>
 
     </form>
+</div>
 </div>
 {% endblock %}
