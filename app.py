@@ -11,7 +11,7 @@ from flask_wtf.csrf import CSRFProtect
 
 app = Flask(__name__)
 
-
+# from api.v1.payment import v1_payment
 from api.v1.auth import v1_auth
 from api.v1.orders import v1_orders
 from api.v1.update import v1_update
@@ -34,6 +34,7 @@ db.init_app(app)
 app.register_blueprint(v1_auth,url_prefix="/api/v1")
 app.register_blueprint(v1_orders,url_prefix="/api/v1")
 app.register_blueprint(v1_update,url_prefix="/api/v1")
+# app.register_blueprint(v1_payment,url_prefix="/api/v1")
 
 
 MAIL_SERVER = os.getenv("EMAIL_HOST")

@@ -27,7 +27,7 @@ def user_update():
     flash("your id update successfully")
     return redirect("/addorder")
 
-@v1_update.route("/update_account" , methods=["PUT"])
+@v1_update.route("/update_account" , methods=["POST"])
 def update_account():
     if "user_id" not in session:
         return redirect("/login")
@@ -41,4 +41,4 @@ def update_account():
     bal.Acc_num=request.form.get("Acc_num")
     db.session.commit()
     flash("Your account updated")
-    return render_template("addorder.html")
+    return redirect("/addorder")

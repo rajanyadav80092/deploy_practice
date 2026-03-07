@@ -209,9 +209,6 @@ def add_order():
     flash("order added successfully")
     return redirect("/addorder")
 
-
-
-
 @v1_orders.route("/allorder")
 @rate_limit_middleware
 def allorder():
