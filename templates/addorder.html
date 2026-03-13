@@ -1,13 +1,38 @@
 {% extends 'home.html' %}
 {% block content %}
-<div class="main-container">
-<div class="divclass">
-<form action="/api/v1/addorder" method="post">
-   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <input class="glash-input" type="text" name="product" placeholder="enter your product" required><br><br>
-    <input class="glash-input" type="number" name="amount" placeholder="enter amount" required><br><br>
-    <button class="glash-btn" type="submit">Addorder</button><br>
-</form>
+    <nav class="order-nav">
+        <h3>paint</h3>
+        <h3>shirt</h3>
+        <h3>shoe</h3>
+    </nav>
+<div class ="shirt-class">
+    <img src="images/trollyred.jpeg" alt="shirt">
+    <img src="images/trollyred.jpeg" alt="shirt">
+    <img src="images/trollyred.jpeg" alt="shirt">
+    <img src="images/trollyred.jpeg" alt="shirt">
+    <img src="images/trollyred.jpeg" alt="shirt">
+    <img src="images/trollyred.jpeg" alt="shirt">
 </div>
+<div class ="pant-class">
+    <div class="pant"></div>
+    <div class="pant"></div>
+    <div class="pantt"></div>
+    <div class="pantt"></div>
+    <div class="pant"></div>
 </div>
+<div class ="shoe-class">
+    <div class="shoe"></div>
+    <div class="shoe"></div>
+    <div class="shoe"></div>
+    <div class="shoe"></div>
+    <div class="shoe"></div>
+</div>
+<div class ="beauty-class">
+    <div class="beauty"></div>
+    <div class="beauty"></div>
+    <div class="beauty"></div>
+    <div class="beauty"></div>
+    <div class="beauty"></div>
+</div>
+
 {% endblock %}
