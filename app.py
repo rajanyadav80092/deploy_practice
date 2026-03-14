@@ -121,6 +121,10 @@ def delete_ban():
 def admin_make_use():
     return render_template("admin_make_user.html")
 
+@app.route("/payment")
+def payment():
+    return render_template("payment.html")
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

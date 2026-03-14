@@ -451,3 +451,26 @@ def debug_cache(user_id):
         "count": len(parsed_data),
         "data": parsed_data
     })
+
+@v1_orders.route("/payment_method",methods=["POST",])
+@rate_limit_middleware
+def payment_method():
+    if "user_id" not in session:
+        return redirect("/login")
+    number=request.form.get("mobile_number")
+    
+    reciev=Balance.query.filter_by(mobile=mobile).first()
+    if not reciev:
+        return jsonify({"msg":"Upi not found"})
+    amount=request.form.get("balance")
+    id=session["user_id"]
+    
+    
+    sender_id=Balance.query.filter_by(user_bal_id=id).first()
+    if not sender_id:
+        return redirect("addaccount")
+    if sender_id.balance<amount:
+        return redirect(url_for("api_v1.add_balance"))
+    sender_id.balance-=amount
+    reciev.balance+=amount
+    return jsonify({"msg":"Your balance send successfull"})
