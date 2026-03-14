@@ -34,4 +34,4 @@ class Payment(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     user_number=db.Column(db.Integer,nullable=False)
     amount=db.Column(db.Float,nullable=False)
-    payment_id=db.column(db.Integer,db.ForeignKey("user.id",nullable=False))
+    payment_id=db.Column(db.Integer,db.ForeignKey("user.id"),nullable=False)

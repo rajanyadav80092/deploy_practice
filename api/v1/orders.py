@@ -241,11 +241,11 @@ def add_account():
     if "user_id" not in session:
         return redirect("/login")
     name=request.form.get("Acc_holder_name")
-    if len(name)>=3:
-        name=name
-    flash("user name always larger than 3")
-    return redirect("/addaccount")
-        
+    if len(name)<=3:
+        flash("user name always larger than 3")
+        return redirect("/addaccount")
+    
+    mobile=request.form.get("mobile")
     balance=request.form.get("balance")
     Acc_name=request.form.get("Acc_name")
     password=request.form.get("password")
@@ -254,7 +254,7 @@ def add_account():
         return redirect("/addaccount")
     hashed=generate_password_hash(password)
     Acc_num=request.form.get("Acc_num")
-    bala=Balance(Acc_holder_name=name,password=hashed,Acc_name=Acc_name,account=Acc_num,user_bal_id=session["user_id"],balance=balance)
+    bala=Balance(Acc_holder_name=name,password=hashed,Acc_name=Acc_name,mobile=mobile,account=Acc_num,user_bal_id=session["user_id"],balance=balance)
     db.session.add(bala)
     db.session.commit()
     flash("balance added successfully buy order")
@@ -458,17 +458,16 @@ def payment_method():
     if "user_id" not in session:
         return redirect("/login")
     number=request.form.get("mobile_number")
-    
-    reciev=Balance.query.filter_by(mobile=mobile).first()
-    if not reciev:
-        return jsonify({"msg":"Upi not found"})
     amount=request.form.get("balance")
     id=session["user_id"]
     
     
     sender_id=Balance.query.filter_by(user_bal_id=id).first()
     if not sender_id:
-        return redirect("addaccount")
+        return redirect("/addaccount")
+    reciev=Balance.query.filter_by(mobile=mobile).first()
+    if not reciev:
+        return jsonify({"msg":"Upi not found"})
     if sender_id.balance<amount:
         return redirect(url_for("api_v1.add_balance"))
     sender_id.balance-=amount

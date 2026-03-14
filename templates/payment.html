@@ -1,11 +1,12 @@
 {% extends 'home.html'%}
 {% block content %}
-<div class="main-container"></div>
+<div class="main-container">
 <div class="divclass">
     <form action="/api/v1/payment_method" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><br><br>
     <input class="glash-input" type="number" name="mobile_number" placeholder="Enter mobile number"><br><br>
     <input class="glash-input" type="number"  name="balance" placeholder="Enter your amount"><br><br>
+    <button class="glash-btn" type="submit">Submit</button>
 </form>
 </div>
 </div>
