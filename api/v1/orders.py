@@ -17,7 +17,7 @@ current_redis=redis.Redis(
     decode_responses=True
 )
 
-REQUEST_LIMIT=3
+REQUEST_LIMIT=10
 WINDOW_TIME=30
 
 user_requests={}
@@ -139,7 +139,7 @@ def all_balance():
     return jsonify({
         "Account detail":row
     })
-@v1_orders.route("/mybalance",methods=["POST","GET"])
+@v1_orders.route("/mybalance",methods=["POST"])
 @rate_limit_middleware
 def balance_detail():
     if "user_id" not in session:
@@ -452,7 +452,7 @@ def debug_cache(user_id):
         "data": parsed_data
     })
 
-@v1_orders.route("/payment_method",methods=["POST",])
+@v1_orders.route("/payment_method",methods=["POST"])
 @rate_limit_middleware
 def payment_method():
     if "user_id" not in session:
@@ -461,15 +461,25 @@ def payment_method():
     amount=request.form.get("balance")
     id=session["user_id"]
     
-    
-    sender_id=Balance.query.filter_by(user_bal_id=id).first()
-    if not sender_id:
-        return redirect("/addaccount")
-    reciev=Balance.query.filter_by(mobile=mobile).first()
-    if not reciev:
-        return jsonify({"msg":"Upi not found"})
-    if sender_id.balance<amount:
-        return redirect(url_for("api_v1.add_balance"))
-    sender_id.balance-=amount
-    reciev.balance+=amount
-    return jsonify({"msg":"Your balance send successfull"})
+    try:
+        db.session.begin()
+        sender = Balance.query.filter_by(user_bal_id=id).first()
+        if not sender:
+            return redirect("/addaccount")
+        reciev = Balance.query.filter_by(mobile=number).first()
+        
+        if sender.mobile==int(number):
+            return jsonify({"msg":"Same upi no transaction"})
+        
+        if not reciev:
+            return jsonify({"msg":"Upi not found"})
+        if sender.balance < int(amount):
+            print(sender.balance, amount)
+            return redirect("/addamount")
+        sender.balance -= int(amount)
+        reciev.balance += int(amount)
+        db.session.commit()
+        return jsonify({"msg":"success"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg":"failed"})

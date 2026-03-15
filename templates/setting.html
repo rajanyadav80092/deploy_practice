@@ -2,15 +2,16 @@
 {% block content %}
 <div class="setting"><br>
     {% if session.get("user_role")=="user" %}
-<a href="/mybalance">Check-Balance</a><br><br>
+<a href="/mybalanc">Check-Balance</a><br><br>
 <a href="/update_user">Update-id</a><br><br>
 <a href="/api/v1/dashboard">Dashboard</a><br><br>
 <a href="/update_account">Update-Account</a><br><br>
 <a href="/api/v1/logout">Logout</a><br><br>
 <a href="/delete">Delete_id</a><br><br>
 <a href="/delete_ban">Delete-Bank</a><br><br>
+<a href="/payment">Upi</a><br><br>
 {% elif session.get("user_role")=="admin" %}
-<a href="/mybalance">Check-Balance</a><br><br>
+<a href="/mybalanc">Check-Balance</a><br><br>
 <a href="/update_user">Update-id</a><br><br>
 <a href="/api/v1/dashboard">Dashboard</a><br><br>
 <a href="/update_account">Update-Account</a><br><br>
