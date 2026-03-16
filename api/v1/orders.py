@@ -471,6 +471,8 @@ def payment_method():
         if sender.mobile==int(number):
             return jsonify({"msg":"Same upi no transaction"})
         
+        if int(amount)>10000:
+            return jsonify({"msg":"you can send maximum 10000 at a time "})
         if not reciev:
             return jsonify({"msg":"Upi not found"})
         if sender.balance < int(amount):
