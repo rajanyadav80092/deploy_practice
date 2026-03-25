@@ -188,3 +188,7 @@ body{
     top:50%;
     left:40rem;
 }
+
+.divclass a{
+    text-decoration: none;
+}

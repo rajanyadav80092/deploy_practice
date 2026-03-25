@@ -289,7 +289,7 @@ def all_user():
         return redirect("/login")
     if session["user_role"]!="admin":
         return jsonify({"msg":"your are not visit this route sorry"})
-    user=User.query.limit(2).offset(0).all()
+    user=User.query.limit(10).offset(0).all()
     if not user:
         flash("empty file")
         return redirect("/signin")
