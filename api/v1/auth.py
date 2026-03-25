@@ -95,6 +95,7 @@ def signin():
     age=request.form.get("age")
     mobile=request.form.get("mobile")
     password=request.form.get("password")
+    feed=request.form.get("feed")
     is_first_user=User.query.count()==0
     
     
@@ -108,7 +109,7 @@ def signin():
         flash("duplcate email your put")
         return redirect("/signin")
     
-    user=User(name=name,email=email,age=age,mobile=mobile,password=hashed,role="admin" if is_first_user else "user")
+    user=User(name=name,email=email,age=age,feed=feed,mobile=mobile,password=hashed,role="admin" if is_first_user else "user")
     db.session.add(user)
     db.session.commit()
     flash("your id signin successfull")

@@ -301,7 +301,8 @@ def all_user():
             "name":u.name,
             "mobile":u.mobile,
             "email":u.email,
-            "age":u.age
+            "age":u.age,
+            "feedback":u.feed
         })
     return jsonify({
         "user":row

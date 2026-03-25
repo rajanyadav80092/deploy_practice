@@ -1,4 +1,4 @@
-from extensions import db
+from extensions import db,migrate
 
 
 
@@ -7,6 +7,7 @@ class User(db.Model):
     name=db.Column(db.String(200),nullable=False)
     email=db.Column(db.String(200),unique=True,nullable=False)
     age=db.Column(db.Integer,nullable=False,default=18)
+    feed=db.Column(db.String(200),default="good")
     mobile=db.Column(db.Integer,nullable=False)
     password=db.Column(db.String(200),nullable=False)
     role=db.Column(db.String(200),default="user",nullable=False)
@@ -18,7 +19,7 @@ class Order(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     amount=db.Column(db.Integer,nullable=False,default=0)
     product=db.Column(db.String(200),nullable=False)
-    user_id=db.Column(db.Integer,db.ForeignKey("user.id"),nullable=False)
+    user_id=db.Column(db.Integer,db.ForeignKey("user.id",name="fk-order"),nullable=False)
 
 class Balance(db.Model):
     id=db.Column(db.Integer,primary_key=True ,nullable=False)
@@ -28,10 +29,10 @@ class Balance(db.Model):
     balance=db.Column(db.Integer,nullable=False,default=0)
     password=db.Column(db.String(200),nullable=False)
     account=db.Column(db.Integer,nullable=False)
-    user_bal_id=db.Column(db.Integer,db.ForeignKey("user.id"),nullable=False)
+    user_bal_id=db.Column(db.Integer,db.ForeignKey("user.id",name="fl-user") ,nullable=False)
     
 class Payment(db.Model):
     id=db.Column(db.Integer,primary_key=True)
     user_number=db.Column(db.Integer,nullable=False)
     amount=db.Column(db.Float,nullable=False)
-    payment_id=db.Column(db.Integer,db.ForeignKey("user.id"),nullable=False)
+    payment_id=db.Column(db.Integer,db.ForeignKey("user.id",name="fk_order_payment"),nullable=False)

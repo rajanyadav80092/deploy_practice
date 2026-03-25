@@ -4,12 +4,13 @@ load_dotenv()
 import os
 from flask import Flask,render_template,redirect,jsonify,flash,request,session
 from config import Config
-from extensions import db
+from extensions import *
 from flask_wtf import CSRFProtect
 from flask_wtf.csrf import CSRFProtect
 
 
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///users.db"
 
 # from api.v1.payment import v1_payment
 from api.v1.auth import v1_auth
@@ -30,6 +31,7 @@ app.config.update(
 
 csrf = CSRFProtect(app)
 db.init_app(app)
+migrate.init_app(app,db)
 
 app.register_blueprint(v1_auth,url_prefix="/api/v1")
 app.register_blueprint(v1_orders,url_prefix="/api/v1")
@@ -126,7 +128,6 @@ def payment():
     return render_template("payment.html")
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-    app.run(host="0.0.0.0", port=5000,debug=False)
+    app.run(host="0.0.0.0", port=5000,debug=True)
+    app.app_context().push()
    
